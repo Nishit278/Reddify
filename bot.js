@@ -1,6 +1,6 @@
 require("dotenv").config();
 const Discord = require("discord.js");
-const axios = require("axios");
+const {getMemes, getNews, getCats} = require("./posts.js")
 const client = new Discord.Client({
     partials: ['CHANNEL', "MESSAGE"],
     restTimeOffset: 0,
@@ -9,7 +9,7 @@ const client = new Discord.Client({
 const token = process.env.BOT_TOKEN;
 // const fetch = require("node-fetch");
 // import fetch from "node-fetch";
-const PREFIX = "r";
+const PREFIX = "!r";
 
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
@@ -17,33 +17,67 @@ client.on("messageCreate", async (message) => {
       const [cmdName, ...args] = message.content
         .substring(PREFIX.length)
         .split(/\s+/);
-      if(cmdName === "ping"){
+        // console.log(cmdName, args);
+      if(args[0] === "meme"){
         
-            const random = Math.floor(Math.random() * 31);
+            const random = Math.floor(Math.random() * 30);
             const post = await getMemes(random);
             // console.log(post.title)
-            const exampleEmbed = new Discord.MessageEmbed()
+            const embed = new Discord.MessageEmbed()
             .setTitle(post.title)
             .setURL("https://www.reddit.com" + post.permalink)
             .setImage(post.url)
             .setFooter(`👍 ${post.ups} | 💬 ${post.num_comments}`);
-            console.log(post);
-            message.channel.send({embeds: [exampleEmbed]});
-            // message.channel.send(post.title, { files: [post.url] });
+            // console.log(post);
+            message.channel.send({embeds: [embed]});
+          
           
       }
+      if(args[0] === "news"){
+        
+        const random = Math.floor(Math.random() * 30);
+        const post = await getNews(random);
+        // console.log(post.title)
+        const embed = new Discord.MessageEmbed()
+        .setTitle(post.title)
+        .setURL("https://www.reddit.com" + post.permalink)
+        .setThumbnail(post.thumbnail)
+        .setFooter(`👍 ${post.ups} | 💬 ${post.num_comments}`);
+        // console.log(post);
+        message.channel.send({embeds: [embed]});
+        // message.channel.send(post.title, { files: [post.url] });
+    }
+    if(args[0] === "cats"){
+        
+        const random = Math.floor(Math.random() * 30);
+        const post = await getCats(random);
+        console.log(post)
+        if(post.is_video || post.post_hint){
+            const embed = new Discord.MessageEmbed()
+            .setTitle(post.title)
+            .setURL("https://www.reddit.com" + post.permalink)
+            .setThumbnail(post.thumbnail)
+            .setFooter(`👍 ${post.ups} | 💬 ${post.num_comments}`);
+        message.channel.send({embeds: [embed]});
+
+        } else {
+            const embed = new Discord.MessageEmbed()
+            .setTitle(post.title)
+            .setURL("https://www.reddit.com" + post.permalink)
+            .setImage(post.url)
+            .setFooter(`👍 ${post.ups} | 💬 ${post.num_comments}`);
+        message.channel.send({embeds: [embed]});
+
+        }
+    
+        // console.log(post);
+        // message.channel.send(post.title, { files: [post.url] });
+      
+  }
     }
   });
 
-const getMemes = async (num)=>{
-    const post = await axios.get("https://www.reddit.com/r/wholesomememes/top.json?limit=30");
-    // const data = await post.json();
-    // const postArray = post.data.children;
-    // return postArray[num].data;
-    const postArray = post.data.data.children;
-    return postArray[num].data;
 
-}
 
 
 client.on("ready", () => {

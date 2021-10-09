@@ -1,0 +1,19 @@
+{
+  "name": "redify",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "devStart": "nodemon bot.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.22.0",
+    "discord.js": "^13.2.0",
+    "dotenv": "^10.0.0",
+    "node-fetch": "^3.0.0",
+    "npm": "^8.0.0"
+  }
+}

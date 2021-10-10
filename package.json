@@ -11,9 +11,11 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.22.0",
+    "btoa": "^1.2.1",
     "discord.js": "^13.2.0",
     "dotenv": "^10.0.0",
     "node-fetch": "^3.0.0",
-    "npm": "^8.0.0"
+    "npm": "^8.0.0",
+    "spotify-web-api-node": "^5.0.2"
   }
 }

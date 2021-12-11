@@ -45,7 +45,6 @@ const axios = require("axios");
 // }
 
 function getQuery(name) {
-
   return {
     operationName: "getUserProfile",
     variables: {
@@ -56,19 +55,30 @@ function getQuery(name) {
   };
 }
 const userInfo = async (name) => {
-    const data = await axios.post("https://leetcode.com/graphql", getQuery(name), {
+  const data = await axios.post(
+    "https://leetcode.com/graphql",
+    getQuery(name),
+    {
       headers: {
         "Content-Type": "application/json",
       },
-    });
-    const userStats = data.data.data.matchedUser;
-    // console.log(userStats);
-    // userStats.map(user => {
-    //     console.log(user.username);
-    // })
-    return userStats
-}
-// userInfo("Nishit27801");
+    }
+  );
+  const userStats = data.data.data.matchedUser;
+  // console.log(userStats);
+  // userStats.map(user => {
+  //     console.log(user.username);
+  // })
+  return userStats;
+};
+// const display = async (name) => {
+//   const data = await userInfo(name);
+//   console.log(data.submitStats.acSubmissionNum);
+//   data.submitStats.acSubmissionNum.map(user => {
+//       console.log(user.count.toString());
+//   })
+// };
 // display("Nishit27801");
+// display("sinerheist");
 
 module.exports = { userInfo };

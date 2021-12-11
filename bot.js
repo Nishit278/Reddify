@@ -163,37 +163,48 @@ client.on("messageCreate", async (message) => {
     }
 
     if (cmd === "leetcode") {
-      const data = await userInfo(secondArg);
-      // console.log(data);
-      // console.log(data.submitStats);
-      let solved = [];
-      data.submitStats.acSubmissionNum.map((s) => {
-        solved.push(s.count);
-      });
-      // console.log(solved);
-      let embed = new Discord.MessageEmbed()
-        .setColor("#1DB954")
-        .setTitle(data.profile.realName)
-        .setThumbnail(data.profile.userAvatar)
-        .setURL(`https://leetcode.com/${data.username}/`)
-        .addFields(
-          { name: "Username: ", value: data.username },
-          { name: "Country: ", value: data.profile.countryName },
-          { name: "Stars: ", value: data.profile.starRating.toString() }
-        )
-        .addField("Skills", data.profile.skillTags.join(", "))
-        .addFields(
+      try {
+        console.log(secondArg);
+        const data = await userInfo(secondArg);
+        // console.log(data);
+        // console.log(data.submitStats);
+        let solved = [];
+        data.submitStats.acSubmissionNum.map((s) => {
+          solved.push(s.count);
+        });
+        // console.log(solved);
+        let embed = new Discord.MessageEmbed()
+          .setColor("#1DB954")
+          .setTitle(data.profile.realName)
+          .setThumbnail(data.profile.userAvatar)
+          .setURL(`https://leetcode.com/${data.username}/`)
+          .addFields(
+            { name: "Username: ", value: data.username },
+            { name: "Stars: ", value: data.profile.starRating.toString() }
+          );
+        if (data.profile.countryName) {
+          embed.addField("Country: ", data.profile.countryName);
+        }
+        if (data.profile.skillTags.length > 0) {
+          embed.addField(
+            "Skills",
+            (value = data.profile.skillTags?.join(", "))
+          );
+        }
+        embed.addFields(
           { name: "Solved Questions", value: solved[0].toString() },
           { name: "Easy", value: solved[1].toString(), inline: true },
           { name: "Medium", value: solved[2].toString(), inline: true },
-          { name: "Hard", value: solved[3].toString(), inline: true }
+          { name: "Hard", value: solved[3]?.toString(), inline: true }
         );
-      // .addField("Genres: ", song.genres.join(", "))
-      // .addField("Followers: ", song.followers.total.toString());
-      message.channel.send({ embeds: [embed] });
+        message.channel.send({ embeds: [embed] });
+        // console.log(data);
+      } catch (err) {
+        console.log(err.message);
+        message.channel.send("Please check for typos and try again :)");
+      }
     }
     if (cmd === "covid") {
-      
       try {
         const data = await covid(secondArg);
         // console.log(data);

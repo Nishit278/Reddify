@@ -29,4 +29,5 @@ const getPets = async (num, search) => {
     return post.data.hits[num];
 };
 
+
 module.exports = { getMemes, getNews, getPets };

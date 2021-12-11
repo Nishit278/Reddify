@@ -2,7 +2,9 @@ require("dotenv").config();
 const Discord = require("discord.js");
 const { getMemes, getNews, getPets } = require("./posts.js");
 const { authSpotify, searchSpotify } = require("./spotify.js");
-const { play } = require("./play.js");
+const { userInfo } = require("./leetcode.js");
+const { covid } = require("./covid.js");
+
 const client = new Discord.Client({
   partials: ["CHANNEL", "MESSAGE"],
   restTimeOffset: 0,
@@ -11,7 +13,7 @@ const client = new Discord.Client({
 const token = process.env.BOT_TOKEN;
 // const fetch = require("node-fetch");
 // import fetch from "node-fetch";
-const PREFIX = ".r";
+const PREFIX = ".y";
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
@@ -35,7 +37,13 @@ client.on("messageCreate", async (message) => {
         .addFields(
           { name: "Prefix", value: ".r", inline: false },
           { name: "Reddit", value: "<Prefix> <Value>", inline: false },
-          { name: "Values", value: "meme\nnews\ncats", inline: false },
+          { name: "Values", value: "meme, news", inline: false },
+          { name: "Image", value: "<Prefix><img><anything>", inline: false },
+          {
+            name: "Leetcode",
+            value: "<Prefix><leetcode><username>",
+            inline: false,
+          },
           { name: "Music", value: "<Prefix> <Flag> <Value>", inline: false },
           { name: "Flags", value: "tr\nal\npl\nar", inline: true },
           {
@@ -69,7 +77,7 @@ client.on("messageCreate", async (message) => {
     if (cmd === "news") {
       const random = Math.floor(Math.random() * 10);
       const post = await getNews(random);
-      console.log(post);
+      // console.log(post);
       message.channel.send(post.url);
       // const embed = new Discord.MessageEmbed()
       //   .setColor("#ff4500")
@@ -86,20 +94,19 @@ client.on("messageCreate", async (message) => {
       // console.log(secondArg);
       try {
         const random = Math.floor(Math.random() * 20);
-      const post = await getPets(random, secondArg);
+        const post = await getPets(random, secondArg);
 
-      const embed = new Discord.MessageEmbed()
-        .setColor("#977fd7")
-        .setTitle(`Uploaded by ${post.user}`)
-        .setURL(post.pageURL)
-        .setImage(post.webformatURL)
-        .setTimestamp()
-        .setFooter(`👍 ${post.likes} | 💬 ${post.comments}`);
-      message.channel.send({ embeds: [embed] });
+        const embed = new Discord.MessageEmbed()
+          .setColor("#977fd7")
+          .setTitle(`Uploaded by ${post.user}`)
+          .setURL(post.pageURL)
+          .setImage(post.webformatURL)
+          .setTimestamp()
+          .setFooter(`👍 ${post.likes} | 💬 ${post.comments}`);
+        message.channel.send({ embeds: [embed] });
       } catch (err) {
-        message.channel.send("Couldn't find any related images")
+        message.channel.send("Couldn't find any related images");
       }
-      
     }
     if (cmd === "tr" || cmd === "ar" || cmd === "al" || cmd == "pl") {
       try {
@@ -139,7 +146,7 @@ client.on("messageCreate", async (message) => {
             .addField("Owner", song.owner.display_name);
           message.channel.send({ embeds: [embed] });
         } else {
-          console.log(song);
+          // console.log(song);
           let embed = new Discord.MessageEmbed()
             .setColor("#1DB954")
             .setTitle(song.name)
@@ -154,8 +161,58 @@ client.on("messageCreate", async (message) => {
         message.channel.send("Please check for typos and try again :)");
       }
     }
-    if (cmd === "play") {
-      play(message, cmd, args);
+
+    if (cmd === "leetcode") {
+      const data = await userInfo(secondArg);
+      // console.log(data);
+      // console.log(data.submitStats);
+      let solved = [];
+      data.submitStats.acSubmissionNum.map((s) => {
+        solved.push(s.count);
+      });
+      // console.log(solved);
+      let embed = new Discord.MessageEmbed()
+        .setColor("#1DB954")
+        .setTitle(data.profile.realName)
+        .setThumbnail(data.profile.userAvatar)
+        .setURL(`https://leetcode.com/${data.username}/`)
+        .addFields(
+          { name: "Username: ", value: data.username },
+          { name: "Country: ", value: data.profile.countryName },
+          { name: "Stars: ", value: data.profile.starRating.toString() }
+        )
+        .addField("Skills", data.profile.skillTags.join(", "))
+        .addFields(
+          { name: "Solved Questions", value: solved[0].toString() },
+          { name: "Easy", value: solved[1].toString(), inline: true },
+          { name: "Medium", value: solved[2].toString(), inline: true },
+          { name: "Hard", value: solved[3].toString(), inline: true }
+        );
+      // .addField("Genres: ", song.genres.join(", "))
+      // .addField("Followers: ", song.followers.total.toString());
+      message.channel.send({ embeds: [embed] });
+    }
+    if (cmd === "covid") {
+      
+      try {
+        const data = await covid(secondArg);
+        // console.log(data);
+        let embed = new Discord.MessageEmbed()
+          .setColor("#1DB954")
+          .setTitle("Covid-19")
+          .setURL("https://www.worldometers.info/coronavirus/")
+          .setThumbnail(data.countryInfo.flag)
+          .addFields(
+            { name: "Confirmed Cases", value: data.cases.toString() },
+            { name: "Deaths", value: data.deaths.toString() },
+            { name: "Recovered", value: data.recovered.toString() },
+            { name: "Active", value: data.active.toString() }
+          );
+        message.channel.send({ embeds: [embed] });
+      } catch (ex) {
+        // console.log(secondArg)
+        message.channel.send("Please check for typos and try again :)");
+      }
     }
   }
 });

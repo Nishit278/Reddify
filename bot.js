@@ -4,6 +4,7 @@ const { getMemes, getNews, getPets } = require("./posts.js");
 const { authSpotify, searchSpotify } = require("./spotify.js");
 const { userInfo } = require("./leetcode.js");
 const { covid } = require("./covid.js");
+// const { contestList } = require("./codeforces.js");
 
 const client = new Discord.Client({
   partials: ["CHANNEL", "MESSAGE"],
@@ -164,7 +165,7 @@ client.on("messageCreate", async (message) => {
 
     if (cmd === "leetcode") {
       try {
-        console.log(secondArg);
+        // console.log(secondArg);
         const data = await userInfo(secondArg);
         // console.log(data);
         // console.log(data.submitStats);
